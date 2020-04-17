@@ -8,12 +8,11 @@ import akka.event.LoggingAdapter;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-
-import java.io.Serializable;
+import proto.Message;
 
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ProtagonistaSupervisor extends AbstractActor implements Serializable {
+public class ProtagonistaSupervisor extends AbstractActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
@@ -24,35 +23,36 @@ public class ProtagonistaSupervisor extends AbstractActor implements Serializabl
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Mensagem.bate.class, this::inicio)
-                .match(Mensagem.rebate.class, this::finale)
+                .match(Message.Mensagem.Ping.class, this::inicio)
+                .match(Message.Mensagem.Pong.class, this::finale)
                 .build();
     }
 
-    private void inicio(Mensagem.bate s) {
+    private void inicio(Message.Mensagem.Ping s) {
         log.info("Criando protagonista para type: " + s.getType());
 
-        Long a = s.getType();
-        type = a.toString();
+        long a = s.getType();
+        type = Long.toString(a);
 
         ProtagonistaActorTypeB = getContext().actorOf(Props.create(ProtagonistaActor.class), "ProtagonistaActorType" + type);
 
         ProtagonistaActorTypeB.tell(s, getSelf());
     }
 
-    private void finale(Mensagem.rebate s) {
-        log.info("Mensagem recebida: " + s.getText());
+    private void finale(Message.Mensagem.Pong s) {
+        log.info("Mensagem recebida: " + s.getMessage());
 
-       tipo = s.setType(s.getType()+1);
+        tipo = (s.getType() + 1);
 
-       if(tipo<6){
-           log.info("Criando novo actor para type: " + tipo);
-           ActorRef ProtagonistaActorTypeR = getContext().actorOf(Props.create(ProtagonistaActor.class), "ProtagonistaActorType" + tipo);
-           ProtagonistaActorTypeR.tell(new Mensagem.bate("Ping", s.getType()), getSelf());
 
-       }else{
-           log.info("Cabôôôôôôôôôôôôôôôôôôôô");
+        if (tipo < 6) {
+            log.info("Criando novo actor para type: " + tipo);
+            ActorRef ProtagonistaActorTypeR = getContext().actorOf(Props.create(ProtagonistaActor.class), "ProtagonistaActorType" + tipo);
+            ProtagonistaActorTypeR.tell(Message.Mensagem.Ping.newBuilder().setMessage("Ping").setType(tipo).build(), getSelf());
 
-       }
+        } else {
+            log.info("Cabôôôôôôôôôôôôôôôôôôôô");
+
+        }
     }
 }

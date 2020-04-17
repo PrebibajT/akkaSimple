@@ -6,12 +6,11 @@ import akka.event.LoggingAdapter;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
+import proto.Message;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ProtagonistaActor extends AbstractActor implements Serializable {
+public class ProtagonistaActor extends AbstractActor {
 
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
 
@@ -24,21 +23,14 @@ public class ProtagonistaActor extends AbstractActor implements Serializable {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Mensagem.bate.class, this::inicio)
-            //  .match(Mensagem.rebate.class, this::reinicio)
-
+                .match(Message.Mensagem.Ping.class, this::inicio)
                 .build();
     }
 
-    private void inicio(Mensagem.bate s) {
-        log.info(s.getText() + " enviado");
+    private void inicio(Message.Mensagem.Ping s) {
+        log.info(s.getMessage() + " enviado");
         FiguranteSupervisor.tell(s, getSelf());
     }
-
-//    private void reinicio(Mensagem.rebate s) {
-//        log.info(s.getText() + " enviado");
-//        FiguranteSupervisor.tell(s, getSelf());
-//    }
 
 }
 

@@ -7,6 +7,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import proto.Message;
 
 @SpringBootApplication
 public class ProtagonistaMain {
@@ -19,7 +20,7 @@ public class ProtagonistaMain {
         ActorSystem system = ActorSystem.create("ProtagonistaSystem", akkaConfiguration);
         ActorRef protagonista = system.actorOf(Props.create(ProtagonistaSupervisor.class), "tudo.ProtagonistaSupervisor");
 
-        protagonista.tell(new Mensagem.bate("Ping", (long) 1), ActorRef.noSender());
+            protagonista.tell(Message.Mensagem.Ping.newBuilder().setMessage("Ping").setType(1).build(), ActorRef.noSender());
 
     }
 }

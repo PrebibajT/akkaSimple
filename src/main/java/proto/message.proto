@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package proto;
+
+option java_package = "proto";
+option java_outer_classname = "Message";
+
+message Mensagem {
+  required string name = 1;
+  required int64 type = 2;
+
+  message Ping {
+    required string message =1;
+    required int64  type = 2;
+  }
+
+  message Pong{
+    required string message =1;
+    required int64  type = 2;
+
+  }
+
+}
